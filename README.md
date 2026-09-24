@@ -1,5 +1,16 @@
 # React + TypeScript + Vite
 
+## Banco de dados MySQL
+
+O esquema inicial para MySQL 8.0+ está em [db/mysql-schema.sql](db/mysql-schema.sql). Para usar na Hostinger:
+
+1. Crie um banco MySQL e um usuário no hPanel.
+2. Abra o phpMyAdmin do banco criado.
+3. Use a aba **Importar** e envie `db/mysql-schema.sql`.
+4. Configure as credenciais do banco nas variáveis de ambiente da hospedagem.
+
+Nesta primeira etapa, o esquema cobre os dados operacionais do LGRP. A autenticação ainda usa o Supabase; migrar usuários, sessões e login para MySQL exige uma etapa adicional no backend.
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
