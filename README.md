@@ -9,6 +9,15 @@ O esquema inicial para MySQL 8.0+ está em [db/mysql-schema.sql](db/mysql-schema
 3. Use a aba **Importar** e envie `db/mysql-schema.sql`.
 4. Configure as credenciais do banco nas variáveis de ambiente da hospedagem.
 
+Na Hostinger, publique o projeto como **Aplicação Node.js**, não como site estático:
+
+- **Arquivo de inicialização:** `server.js`
+- **Comando de build:** `npm run build`
+- **Comando de início:** `npm start`
+- **Node.js:** versão 20 ou superior
+
+O servidor Express serve o conteúdo de `dist` e encaminha as rotas `/api/*` para o backend. Isso evita o erro `404` em `/api/auth`.
+
 O sistema usa MySQL para os dados operacionais e para autenticação. Defina também `JWT_SECRET` e as variáveis `MYSQL_*` na hospedagem.
 
 ```env
