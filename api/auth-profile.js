@@ -7,7 +7,7 @@ export default async function handler(req, res) {
     if (req.method === 'GET') {
       if (req.query.all === 'true' && principal.profile.role === 'Administrador') {
         const { data, error } = await supabase.from('user_profiles').select('*').order('created_at', { ascending: false });
-        if (error) throw error; return res.status(200).json(data);
+        if (error) throw error; return res.status(200).json((data || []).map(({ password_hash: _passwordHash, ...profile }) => profile));
       }
       return res.status(200).json(principal.profile);
     }

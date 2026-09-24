@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Activity, AlertTriangle, ArrowDownToLine, ArrowUpRight, Beaker, Bell, Boxes, CalendarDays, Check, ChevronDown, ClipboardList, FlaskConical, Gauge, History, LayoutDashboard, LogOut, Menu, PackageCheck, Plus, Recycle, Search, ShieldCheck, Truck, UserRound, Users, X, LoaderCircle, Scale, FileText, Clock3, QrCode, RefreshCw } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import supabase from './lib/supabase';
 import './index.css';
 
 type UserProfile = { user_id: string; email: string; role: string; full_name: string };
@@ -52,18 +51,17 @@ export default function App() {
     setProfile(await res.json());
   }, []);
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session: current } }) => {
-      setSession(current);
-      if (current) { try { await loadProfile(current.access_token); } catch (e: any) { setAuthError(e.message); } }
-      setAuthLoading(false);
-    });
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, current) => {
-      setSession(current);
-      if (!current) { setProfile(null); setData(emptyData); setAuthLoading(false); }
-      else setTimeout(() => loadProfile(current.access_token).catch((e: any) => setAuthError(e.message)), 0);
-    });
-    return () => subscription.unsubscribe();
+    const current = JSON.parse(localStorage.getItem('lgrp_session') || 'null');
+    setSession(current);
+    if (current) { loadProfile(current.access_token).catch((e: any) => { localStorage.removeItem('lgrp_session'); setSession(null); setAuthError(e.message); }); }
+    setAuthLoading(false);
   }, [loadProfile]);
+  useEffect(() => {
+    if (!session) {
+      setProfile(null);
+      setData(emptyData);
+    }
+  }, [session]);
 
   const request = useCallback(async (path: string, init: RequestInit = {}) => {
     const token = session?.access_token;
@@ -104,13 +102,16 @@ export default function App() {
   const login = async (event: React.FormEvent) => {
     event.preventDefault(); setAuthError(''); setAuthLoading(true);
     try {
-      const result = signUp ? await supabase.auth.signUp({ email, password }) : await supabase.auth.signInWithPassword({ email, password });
-      if (result.error) throw result.error;
-      if (signUp && !result.data.session) setAuthError('Conta criada. Confira seu e-mail para confirmar o cadastro antes de entrar.');
+      const res = await fetch('/api/auth', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password, signUp }) });
+      const result = await res.json();
+      if (!res.ok) throw new Error(result.error || 'Não foi possível autenticar.');
+      localStorage.setItem('lgrp_session', JSON.stringify(result.session));
+      setSession(result.session);
+      await loadProfile(result.session.access_token);
     } catch (e: any) { setAuthError(e.message || 'Não foi possível autenticar.'); }
     finally { setAuthLoading(false); }
   };
-  const signOut = async () => { await supabase.auth.signOut(); setActive('dashboard'); };
+  const signOut = async () => { localStorage.removeItem('lgrp_session'); setSession(null); setProfile(null); setActive('dashboard'); };
   const change = (key: string, value: any) => setForm((current: Row) => ({ ...current, [key]: value }));
   const openModal = (name: string, row: Row | null = null) => { setSelected(row); setForm(row ? { ...row, ...(row.expiry_date ? { expiry_date: String(row.expiry_date).slice(0, 10) } : {}) } : {}); setModal(name); setError(''); };
   const canMutate = (module: string) => !permitted[module] || permitted[module].includes(profile?.role || '');

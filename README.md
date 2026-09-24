@@ -9,7 +9,16 @@ O esquema inicial para MySQL 8.0+ está em [db/mysql-schema.sql](db/mysql-schema
 3. Use a aba **Importar** e envie `db/mysql-schema.sql`.
 4. Configure as credenciais do banco nas variáveis de ambiente da hospedagem.
 
-Nesta primeira etapa, o esquema cobre os dados operacionais do LGRP. A autenticação ainda usa o Supabase; migrar usuários, sessões e login para MySQL exige uma etapa adicional no backend.
+O sistema usa MySQL para os dados operacionais e para autenticação. Defina também `JWT_SECRET` e as variáveis `MYSQL_*` na hospedagem.
+
+```env
+MYSQL_HOST=localhost
+MYSQL_PORT=3306
+MYSQL_DATABASE=nome_do_banco
+MYSQL_USER=usuario_do_banco
+MYSQL_PASSWORD=senha_do_banco
+JWT_SECRET=uma_chave_longa_e_aleatoria
+```
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 

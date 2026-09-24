@@ -1,6 +1,6 @@
 -- LGRP - schema MySQL 8.0+
 -- Import this file in Hostinger hPanel > Databases > phpMyAdmin.
--- Authentication users remain in Supabase until the auth migration is implemented.
+-- Authentication users and password hashes are stored locally in MySQL.
 
 SET NAMES utf8mb4;
 SET time_zone = '+00:00';
@@ -8,6 +8,7 @@ SET time_zone = '+00:00';
 CREATE TABLE IF NOT EXISTS user_profiles (
   user_id VARCHAR(36) NOT NULL PRIMARY KEY,
   email VARCHAR(255) NOT NULL,
+  password_hash VARCHAR(255) NOT NULL,
   full_name VARCHAR(150) NOT NULL DEFAULT '',
   role VARCHAR(30) NOT NULL DEFAULT 'Consulta',
   created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
