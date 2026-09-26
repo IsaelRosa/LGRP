@@ -30,4 +30,4 @@ app.use('/api/waste', waste);
 app.use(express.static(path.join(root, 'dist')));
 app.use((req, res) => res.sendFile(path.join(root, 'dist', 'index.html')));
 
-app.listen(port, () => console.log(`LGRP server listening on port ${port}`));
+app.listen(port, '0.0.0.0', () => console.log(`LGRP server listening on port ${port}`));
